@@ -41,6 +41,9 @@ https://bb.ringingworld.co.uk/help/api.php
 Steps: 
 Get list of ringers by assoc:
 https://bb.ringingworld.co.uk/leading-ringers.php?association_id=17&association=Leicester+Diocesan+Guild&year=2023&annual_totals&length=quarter
+Then get the list by county
+combine, and de-duplicate.
+produce stats for county, guild and an XOR of both.
 
 then query for personal totals:
 https://bb.ringingworld.co.uk/search.php?year=2024&annual_totals&length=quarter&ringer=%22Moira+Johnson%22
