@@ -86,42 +86,51 @@ def ringerslist(years: dict) ->list:
     returns a list of dicts; dicts contain name, and ldg_<years> ie: ldg_2023, ldg_2024, etc.
     intended to be imported into a pandas.DataFrame
     """
+    prefixes = [ 'ldg','county']
 
     ldg_ringers = {}
 
     for year in range( years['from'], years['to']+1 ):
-        ldgurl = f"https://bb.ringingworld.co.uk/export.php?association_id=17&year={year}&length=quarter&pagesize={PAGESIZE}"
-        dict_performances = fetchbbxml( ldgurl )
+        urls = {
+            "ldg": f"https://bb.ringingworld.co.uk/export.php?association_id=17&year={year}&length=quarter&pagesize={PAGESIZE}", 
+            "county": f"https://bb.ringingworld.co.uk/export.php?region=leicestershire&year={year}&length=quarter&pagesize={PAGESIZE}",
+            }
+        for prefix in prefixes:
+            dict_performances = fetchbbxml( urls[prefix] )
 
-        if len(dict_performances['performances']['performance']) == PAGESIZE:
-            print( "WARNING: number of returned records is equal to max pagesize. Records may be missing")
-        print(f"returned {len(dict_performances['performances']['performance'])} records")
+            if len(dict_performances['performances']['performance']) == PAGESIZE:
+                print( "WARNING: number of returned records is equal to max pagesize. Records may be missing")
+            print(f"returned {len(dict_performances['performances']['performance'])} records")
 
-        # extract list of ringers from the xml.
-        for performance in dict_performances['performances']['performance']:
-            for ringer in performance['ringers']['ringer']:
-                name = ringer['#text']
-                id = performance['@id']
+            # extract list of ringers from the xml.
+            for performance in dict_performances['performances']['performance']:
+                for ringer in performance['ringers']['ringer']:
+                    name = ringer['#text']
+                    id = performance['@id']
 
-                if not ldg_ringers.get(name):
-                    ldg_ringers[name] = {}
-                if not ldg_ringers[name].get(year):
-                    ldg_ringers[name][year] = []
+                    if not ldg_ringers.get(name):
+                        ldg_ringers[name] = {}
+                    if not ldg_ringers[name].get(year):
+                        ldg_ringers[name][year] = {}
+                    if not ldg_ringers[name][year].get(prefix):
+                        ldg_ringers[name][year][prefix] = []
 
-                if id in ldg_ringers[name][year]:
-                    print( f"duplicate performance {id} for ringer {name}")
-                else:                
-                    ldg_ringers[name][year].append(id)
+                    if id in ldg_ringers[name][year]:
+                        print( f"duplicate performance {id} for ringer {name}")
+                    else:                
+                        ldg_ringers[name][year][prefix].append(id)
+
 
     ringerlist = []
     for n in ldg_ringers:
         record = { "name": n }
         for year in range(years['from'], years['to'] +1 ):
-            colname = f"ldg_{year}"
-            if year in ldg_ringers[n]:
-                record[colname] = len( ldg_ringers[n][year] )
-            else:
-                record[colname] = 0
+            for prefix in prefixes:
+                colname = f"{prefix}_{year}"
+                if year in ldg_ringers[n] and prefix in ldg_ringers[n][year]:
+                    record[colname] = len( ldg_ringers[n][year][prefix] )
+                else:
+                    record[colname] = 0
         ringerlist.append(record)
 
     return(ringerlist)
