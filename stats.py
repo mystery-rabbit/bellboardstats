@@ -143,14 +143,12 @@ def ringerslist(years: dict) ->list:
     prefixes.append(new_prefix)
 
     ringerlist = []
+    count = DEBUG
     for n in ldg_ringers:
         if DEBUG:
-            try:
-                if count <= 0:
-                    break
-                count -= 1
-            except:
-                count = DEBUG
+            if count <= 0:
+                break
+            count -= 1
 
         record = { "name": n }
         for year in range(years['from'], years['to'] +1 ):
