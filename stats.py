@@ -57,7 +57,7 @@ from pprint import pprint
 
 SLEEP = 0.2 # slows down the API Calls to ensure we don't abuse BellBoard. 5cps.
 PAGESIZE=1000 # limits how many records are returned and allows us to check for overruns. BB supports 10k but doesn't set 'next' headers.
-
+DEBUG=0 # limits run to DEBUG ringers
 # -----------------------------------------------------------------------------
 
 
@@ -88,7 +88,16 @@ def ringerslist(years: dict) ->list:
     """
     prefixes = [ 'ldg','county']
 
-    ldg_ringers = {}
+    ldg_ringers = {} 
+    # ldg_ringers = {
+    #     'name': {
+    #         '2001': {
+    #             'ldg': [ 'idA', 'idB', 'idC', ],
+    #             'county': [ 'idA', 'idC', 'idD' ],
+    #         },
+    #         '2002': ...
+    #     } 
+    # }
 
     for year in range( years['from'], years['to']+1 ):
         urls = {
@@ -119,10 +128,27 @@ def ringerslist(years: dict) ->list:
                         print( f"duplicate performance {id} for ringer {name}")
                     else:                
                         ldg_ringers[name][year][prefix].append(id)
+    
+    new_prefix = "xor"
+    for n in ldg_ringers:
+        for year in ldg_ringers[n]:
+            tmp = []
+            for prefix in ldg_ringers[n][year]:
+                tmp.extend(ldg_ringers[n][year][prefix])
+            ldg_ringers[n][year][new_prefix] = list(dict.fromkeys(tmp)) # de-duplicate list
 
+    prefixes.append(new_prefix)
 
     ringerlist = []
     for n in ldg_ringers:
+        if DEBUG:
+            try:
+                if count <= 0:
+                    break
+                count -= 1
+            except:
+                count = DEBUG
+
         record = { "name": n }
         for year in range(years['from'], years['to'] +1 ):
             for prefix in prefixes:
