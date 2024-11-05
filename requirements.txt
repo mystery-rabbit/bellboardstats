@@ -1,3 +1,5 @@
 xmltodict
 pandas
 openpyxl
+# Added the following for the git hub actions environment:
+requests
