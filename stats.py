@@ -58,9 +58,9 @@ from pprint import pprint
 
 # -----------------------------------------------------------------------------
 
-SLEEP = 0.2 # slows down the API Calls to ensure we don't abuse BellBoard. 5cps.
+SLEEP = 0.1 # slows down the API Calls to ensure we don't abuse BellBoard. 5cps.
 PAGESIZE=1000 # limits how many records are returned and allows us to check for overruns. BB supports 10k but doesn't set 'next' headers.
-DEBUG=0 # limits run to DEBUG ringers
+DEBUG=10 # limits run to DEBUG ringers
 # -----------------------------------------------------------------------------
 
 
