@@ -37,3 +37,10 @@ jobs:
     - name: Execute
       run: |
         python stats.py
+    - name: Store Output
+      uses: actions/upload-artifact@4
+      with:
+        name: output
+        path: output.xlsx
+      
+      
